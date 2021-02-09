@@ -6,43 +6,34 @@
     <template v-else>
         <h3 class="text-white">Всего активных задач: {{ totalActiveTasks }}</h3>
 
-        <div class="card"
-             v-for="task in tasks"
-             :key="task.id"
-        >
-            <h2 class="card-title">
-                {{ task.title }}
-                <AppStatus :type="task.status"/>
-            </h2>
-
-            <p>
-                <strong>
-                    <small>
-                        {{ task.date }}
-                    </small>
-                </strong>
-            </p>
-
-            <router-link
-                :to="`/task/${task.id}`"
-                v-slot="{ navigate }"
-                custom
-            >
-                <button
-                    class="btn primary"
-                    @click="navigate"
-                >Посмотреть</button>
-            </router-link>
-        </div>
+        <AppTask
+            v-for="task in tasks"
+            :key="task.id"
+            :id="task.id"
+            :title="task.title"
+            :date="task.date"
+            :status="task.status"
+        />
     </template>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import AppStatus from '../components/AppStatus';
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+import AppTask from "../components/AppTask";
 
 export default {
-    computed: mapGetters(['tasks', 'totalActiveTasks']),
-    components: {AppStatus},
+    //computed: mapGetters(['tasks', 'totalActiveTasks']),      // Options API
+
+    setup() {                                                   // Composition API
+        const store = useStore();
+
+        return {
+            tasks: computed(() => store.getters.tasks),
+            totalActiveTasks: computed(() => store.getters.totalActiveTasks),
+        }
+    },
+
+    components: {AppTask},
 }
 </script>

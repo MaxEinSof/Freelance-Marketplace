@@ -1,5 +1,5 @@
 <template>
-    <the-navbar></the-navbar>
+    <TheNavbar/>
 
     <div class="container with-nav">
         <router-view/>
@@ -7,14 +7,22 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { onMounted } from 'vue';
+import { mapActions, useStore } from 'vuex';
 import TheNavbar from './components/TheNavbar';
 
 export default {
-    mounted() {
-        this.loadTasks();
+    // mounted() {                          // Options API
+    //     this.loadTasks();
+    // },
+    // methods: mapActions(['loadTasks']),
+
+    setup() {                               // Composition API
+        const store = useStore();
+
+        onMounted(() => store.dispatch('loadTasks'));
     },
-    methods: mapActions(['loadTasks']),
+
     components: {TheNavbar},
 }
 </script>

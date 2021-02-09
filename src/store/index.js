@@ -4,6 +4,7 @@ export default createStore({
     state() {
         return {
             tasks: [],
+            databaseUrl: 'https://freelance-marketplace-97601-default-rtdb.firebaseio.com/tasks',
         }
     },
     getters: {
@@ -26,9 +27,9 @@ export default createStore({
         },
     },
     actions: {
-        async loadTasks({ commit }) {
+        async loadTasks({ state, commit }) {
             try {
-                const response = await fetch('https://freelance-marketplace-97601-default-rtdb.firebaseio.com/tasks.json');
+                const response = await fetch(`${state.databaseUrl}.json`);
                 const result = await response.json();
                 const tasks = Object.keys(result).map(id => ({ id, ...result[id] }) );
 
@@ -38,8 +39,8 @@ export default createStore({
                 console.log(e.message);
             }
         },
-        async uploadTask({ commit }, task) {
-            const response = await fetch('https://freelance-marketplace-97601-default-rtdb.firebaseio.com/tasks.json', {
+        async uploadTask({ state, commit }, task) {
+            const response = await fetch(`${state.databaseUrl}.json`, {
                 method: 'POST',
                 body: JSON.stringify(task),
             });
@@ -48,11 +49,11 @@ export default createStore({
             task.id = result.name;
             commit('createTask', task);
         },
-        async uploadTaskStatus({ getters }, payload) {
+        async uploadTaskStatus({ state, getters }, payload) {
             const task = getters.task(payload.id);
             task.status = payload.status;
 
-            await fetch(`https://freelance-marketplace-97601-default-rtdb.firebaseio.com/tasks/${payload.id}/status.json`, {
+            await fetch(`${state.databaseUrl}/${payload.id}/status.json`, {
                 method: 'PUT',
                 body: JSON.stringify(payload.status),
             });

@@ -39,7 +39,8 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { computed } from 'vue';
+import { mapActions, useStore } from 'vuex';
 import AppStatus from '../components/AppStatus'
 
 export default {
@@ -49,20 +50,37 @@ export default {
             required: true,
         },
     },
-    computed: {
-        task() {
-            return this.$store.getters.task(this.id);
-        },
-    },
-    methods: {
-        ...mapActions(['uploadTaskStatus']),
-        onChangeStatus(status) {
-            this.uploadTaskStatus({
-                id: this.id,
+
+    // computed: {                                          // Options API
+    //     task() {
+    //         return this.$store.getters.task(this.id);
+    //     },
+    // },
+    // methods: {
+    //     ...mapActions(['uploadTaskStatus']),
+    //     onChangeStatus(status) {
+    //         this.uploadTaskStatus({
+    //             id: this.id,
+    //             status,
+    //         });
+    //     },
+    // },
+
+    setup(props) {                                          // Composition API
+        const store = useStore();
+
+        const task = computed(() => store.getters.task(props.id));
+
+        function onChangeStatus(status) {
+            store.dispatch('uploadTaskStatus', {
+                id: props.id,
                 status,
-            });
-        },
+            })
+        }
+
+        return {task, onChangeStatus,}
     },
+
     components: {AppStatus},
 }
 </script>
